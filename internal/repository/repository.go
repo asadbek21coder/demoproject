@@ -13,6 +13,10 @@ type Books interface {
 
 type Authors interface {
 	GetAllAuthors(int, int) ([]*entities.Author, error)
+	GetAuthorById(int) (*entities.Author, error)
+	UpdateAuthor(*entities.Author) (*entities.Author, error)
+	CreateAuthor(*entities.Author) (*entities.Author, error)
+	DeleteAuthor(string) error
 }
 
 type Repository struct {
