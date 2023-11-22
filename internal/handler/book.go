@@ -17,8 +17,7 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 	}
 
 	books, err := h.services.Books.GetAllBooks(page, limit)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	if HandleDatabaseLevelWithMessage(c, h.log, err, "h.services.Books.GetAllBooks") {
 		return
 	}
 

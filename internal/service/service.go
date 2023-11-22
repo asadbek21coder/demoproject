@@ -11,6 +11,10 @@ type Books interface {
 
 type Authors interface {
 	GetAllAuthors(int, int) ([]*entities.Author, error)
+	GetAuthorById(int) (*entities.Author, error)
+	UpdateAuthor(int, *entities.UpdateAuthorReq) (*entities.Author, error)
+	CreateAuthor(*entities.CreateAuthorReq) (*entities.Author, error)
+	DeleteAuthor(int) error
 }
 
 type Service struct {

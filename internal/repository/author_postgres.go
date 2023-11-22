@@ -99,6 +99,7 @@ func (a *AuthorsPostgres) GetAuthorById(id int) (*entities.Author, error) {
 
 	author.CreatedAt = CreatedAt.Format(time.RFC1123)
 	author.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+
 	if err == sql.ErrNoRows {
 		a.Log.Error(err.Error())
 		return &entities.Author{}, status.Error(codes.NotFound, "This author doesn't exist.")
@@ -107,15 +108,15 @@ func (a *AuthorsPostgres) GetAuthorById(id int) (*entities.Author, error) {
 		a.Log.Error(err.Error())
 		return &entities.Author{}, status.Error(codes.Internal, "Oops something went wrong.")
 	}
+
 	return author, nil
 }
 
-func (a *AuthorsPostgres) CreateAuthor(req *entities.Author) (*entities.Author, error) {
-
+func (a *AuthorsPostgres) CreateAuthor(req *entities.CreateAuthorReq) (*entities.Author, error) {
 	var res = &entities.Author{}
 	query := `
 	INSERT INTO author (
-		author_name,
+		author_name
 		) 
 	VALUES
 		($1) 
@@ -129,6 +130,7 @@ func (a *AuthorsPostgres) CreateAuthor(req *entities.Author) (*entities.Author, 
 	err := a.db.QueryRow(
 		query,
 		req.Name).Scan(
+		&res.ID,
 		&res.Name,
 		&CreatedAt,
 		&UpdatedAt)
@@ -142,13 +144,14 @@ func (a *AuthorsPostgres) CreateAuthor(req *entities.Author) (*entities.Author, 
 	return res, nil
 }
 
-func (a *AuthorsPostgres) UpdateAuthor(req *entities.Author) (*entities.Author, error) {
+func (a *AuthorsPostgres) UpdateAuthor(id int, req *entities.UpdateAuthorReq) (*entities.Author, error) {
 	var res = &entities.Author{}
 	query := `
 	UPDATE 
 		author 
 	SET 
-		author_name =$1, 
+		author_name =$1,
+		updated_at = now()
 	WHERE 
 		author_id=$2 
 	AND 
@@ -161,8 +164,7 @@ func (a *AuthorsPostgres) UpdateAuthor(req *entities.Author) (*entities.Author, 
 		updated_at;`
 
 	err := a.db.QueryRow(
-		query,
-		req.Name).Scan(
+		query, req.Name, id).Scan(
 		&res.ID,
 		&res.Name,
 		&CreatedAt,
@@ -179,14 +181,14 @@ func (a *AuthorsPostgres) UpdateAuthor(req *entities.Author) (*entities.Author, 
 	return res, nil
 }
 
-func (a *AuthorsPostgres) DeleteAuthor(authorId string) error {
+func (a *AuthorsPostgres) DeleteAuthor(authorId int) error {
 	queryDeleteAuthor := `
 	UPDATE 
 		author 
 	SET 
 		deleted_at = now() 
 	WHERE 
-		id=$1`
+		author_2id=$1`
 
 	_, err := a.db.Exec(queryDeleteAuthor, authorId)
 	if err != nil {

@@ -14,9 +14,9 @@ type Books interface {
 type Authors interface {
 	GetAllAuthors(int, int) ([]*entities.Author, error)
 	GetAuthorById(int) (*entities.Author, error)
-	UpdateAuthor(*entities.Author) (*entities.Author, error)
-	CreateAuthor(*entities.Author) (*entities.Author, error)
-	DeleteAuthor(string) error
+	UpdateAuthor(int, *entities.UpdateAuthorReq) (*entities.Author, error)
+	CreateAuthor(*entities.CreateAuthorReq) (*entities.Author, error)
+	DeleteAuthor(int) error
 }
 
 type Repository struct {
