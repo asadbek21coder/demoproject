@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -30,7 +31,7 @@ func NewAuthorsPostgres(db *sqlx.DB, log *logger.Logger, cfg *config.Config) *Au
 	}
 }
 
-func (r *AuthorsPostgres) GetAllAuthors(page, limit int) ([]*entities.Author, error) {
+func (a *AuthorsPostgres) GetAllAuthors(page, limit int) ([]*entities.Author, error) {
 	offset := (page - 1) * limit
 	result := []*entities.Author{}
 	query := fmt.Sprintf(`
@@ -47,9 +48,9 @@ func (r *AuthorsPostgres) GetAllAuthors(page, limit int) ([]*entities.Author, er
 	LIMIT $1 OFFSET $2
 	`, authorTable)
 
-	rows, err := r.db.Query(query, limit, offset)
+	rows, err := a.db.Query(query, limit, offset)
 	if err != nil {
-		r.Log.Error(err.Error())
+		a.Log.Error(err.Error())
 		return []*entities.Author{}, status.Error(codes.Internal, "Ooops something went wrong")
 	}
 
@@ -71,4 +72,126 @@ func (r *AuthorsPostgres) GetAllAuthors(page, limit int) ([]*entities.Author, er
 	}
 
 	return result, err
+}
+
+func (a *AuthorsPostgres) GetAuthorById(id int) (*entities.Author, error) {
+	author := &entities.Author{}
+	query := `
+		SELECT 
+			author_id,
+			author_name, 
+			created_at, 
+			updated_at 
+		FROM 
+			author 
+		WHERE 
+			author_id=$1 
+		AND 
+			deleted_at 
+		IS NULL`
+
+	err := a.db.QueryRow(query, id).Scan(
+		&author.ID,
+		&author.Name,
+		&CreatedAt,
+		&UpdatedAt,
+	)
+
+	author.CreatedAt = CreatedAt.Format(time.RFC1123)
+	author.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	if err == sql.ErrNoRows {
+		a.Log.Error(err.Error())
+		return &entities.Author{}, status.Error(codes.NotFound, "This author doesn't exist.")
+	}
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Author{}, status.Error(codes.Internal, "Oops something went wrong.")
+	}
+	return author, nil
+}
+
+func (a *AuthorsPostgres) CreateAuthor(req *entities.Author) (*entities.Author, error) {
+
+	var res = &entities.Author{}
+	query := `
+	INSERT INTO author (
+		author_name,
+		) 
+	VALUES
+		($1) 
+	RETURNING 
+		author_id,
+		author_name, 
+		created_at, 
+		updated_at;
+		`
+
+	err := a.db.QueryRow(
+		query,
+		req.Name).Scan(
+		&res.Name,
+		&CreatedAt,
+		&UpdatedAt)
+
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Author{}, status.Error(codes.Internal, "Ooops something went wrong")
+	}
+	res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	return res, nil
+}
+
+func (a *AuthorsPostgres) UpdateAuthor(req *entities.Author) (*entities.Author, error) {
+	var res = &entities.Author{}
+	query := `
+	UPDATE 
+		author 
+	SET 
+		author_name =$1, 
+	WHERE 
+		author_id=$2 
+	AND 
+		deleted_at 
+	IS NULL 
+	RETURNING 
+		author_id, 
+		author_name, 
+		created_at,
+		updated_at;`
+
+	err := a.db.QueryRow(
+		query,
+		req.Name).Scan(
+		&res.ID,
+		&res.Name,
+		&CreatedAt,
+		&UpdatedAt)
+
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Author{}, status.Error(codes.Internal, "Ooops something went wrong")
+	}
+
+	res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+
+	return res, nil
+}
+
+func (a *AuthorsPostgres) DeleteAuthor(authorId string) error {
+	queryDeleteAuthor := `
+	UPDATE 
+		author 
+	SET 
+		deleted_at = now() 
+	WHERE 
+		id=$1`
+
+	_, err := a.db.Exec(queryDeleteAuthor, authorId)
+	if err != nil {
+		a.Log.Error(err.Error())
+		return status.Error(codes.Internal, "Ooops something went wrong")
+	}
+	return nil
 }
