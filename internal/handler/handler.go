@@ -16,7 +16,7 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	router.GET("/", h.pong)
+	router.GET("/ping", h.pong)
 
 	books := router.Group("/books")
 	{

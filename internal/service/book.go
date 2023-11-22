@@ -11,6 +11,7 @@ type BooksService struct {
 
 func NewBooksService(repo repository.Books) *BooksService {
 	return &BooksService{repo: repo}
+
 }
 
 func (s *BooksService) GetAllBooks() ([]entities.Book, error) {
