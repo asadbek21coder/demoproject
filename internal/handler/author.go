@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) getAllBooks(c *gin.Context) {
+func (h *Handler) getAllAuthors(c *gin.Context) {
 	limit, err := h.ParseLimitQueryParam(c)
 	if HandleBadRequestErrWithMessage(c, h.log, err, "h.ParseLimitQueryParam(c)") {
 		return
@@ -16,13 +16,13 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 		return
 	}
 
-	books, err := h.services.Books.GetAllBooks(page, limit)
+	authors, err := h.services.Authors.GetAllAuthors(page, limit)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"books": books,
+		"authors": authors,
 	})
 }

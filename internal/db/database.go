@@ -2,31 +2,37 @@ package db
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/asadbek21coder/demoproject/config"
 	"github.com/jmoiron/sqlx"
 )
 
-type Config struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	DBName   string
-	SSLMode  string
-}
+// type Config struct {
+// 	Host     string
+// 	Port     string
+// 	Username string
+// 	Password string
+// 	DBName   string
+// 	SSLMode  string
+// }
 
-func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
-	fmt.Println(cfg)
-	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
-	if err != nil {
-		return nil, err
+func ConnectToDb(cfg config.Config) (*sqlx.DB, error) {
+	psqlString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		cfg.PostgresHost,
+		cfg.PostgresPort,
+		cfg.PostgresUser,
+		cfg.PostgresPassword,
+		cfg.PostgresDatabase,
+	)
+	for cfg.PostgresConnectionTry > 0 {
+		c, err := sqlx.Connect("postgres", psqlString)
+		if err == nil {
+			return c, nil
+		}
+		fmt.Println(err)
+		time.Sleep(time.Second * time.Duration(cfg.PostgresConnectionTimeOut))
+		cfg.PostgresConnectionTry--
 	}
-
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
+	return sqlx.Connect("postgres", psqlString)
 }

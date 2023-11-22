@@ -6,15 +6,21 @@ import (
 )
 
 type Books interface {
-	GetAllBooks() ([]entities.Book, error)
+	GetAllBooks(int, int) ([]*entities.Book, error)
+}
+
+type Authors interface {
+	GetAllAuthors(int, int) ([]*entities.Author, error)
 }
 
 type Service struct {
 	Books
+	Authors
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Books: NewBooksService(repos.Books),
+		Books:   NewBooksService(repos.Books),
+		Authors: NewAuthorsService(repos.Authors),
 	}
 }

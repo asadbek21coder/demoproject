@@ -1,8 +1,17 @@
 package entities
 
 type Book struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Author string `json:"author"`
-	Price  int    `json:"price"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Author    string `json:"author"`
+	Price     int    `json:"price"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type Author struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }

@@ -14,6 +14,6 @@ func NewBooksService(repo repository.Books) *BooksService {
 
 }
 
-func (s *BooksService) GetAllBooks() ([]entities.Book, error) {
-	return s.repo.GetAllBooks()
+func (s *BooksService) GetAllBooks(page, limit int) ([]*entities.Book, error) {
+	return s.repo.GetAllBooks(page, limit)
 }
