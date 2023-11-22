@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./docker/dev
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - ./.go/pkg:/go/pkg
+      - ./.go-cache:/go-cache
+      - $GOPATH/pkg/mod/cache:/go/pkg/mod/cache
+    working_dir: /app
+    ports:
+      - "5005:5005"
+    env_file:
+      - .env
+    environment:
+      GOCACHE: /go-cache
+    depends_on:
+      - db
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - .env
+    profiles:
+      - donotstart
+  db:
+    image: postgres:9
+    environment:
+      POSTGRES_PASSWORD: newpass
+      POSTGRES_DB: demo_db
+    ports:
+      - "5432"
