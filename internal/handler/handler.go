@@ -23,6 +23,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	books := router.Group("/books")
 	{
 		books.GET("/", h.getAllBooks)
+		books.GET("/:id", h.getBookById)
+		books.POST("/", h.createBook)
+		books.PUT("/:id", h.updateBook)
+		books.DELETE("/:id", h.deleteBook)
 	}
 
 	authors := router.Group("/authors")

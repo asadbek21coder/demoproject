@@ -81,3 +81,127 @@ func (r *BooksPostgres) GetAllBooks(page, limit int) ([]*entities.Book, error) {
 
 	return result, err
 }
+
+func (a *BooksPostgres) GetBookById(id int) (*entities.Book, error) {
+	book := &entities.Book{}
+	// query := `
+	// 	SELECT
+	// 		author_id,
+	// 		author_name,
+	// 		created_at,
+	// 		updated_at
+	// 	FROM
+	// 		author
+	// 	WHERE
+	// 		author_id=$1
+	// 	AND
+	// 		deleted_at
+	// 	IS NULL`
+
+	// err := a.db.QueryRow(query, id).Scan(
+	// 	&author.ID,
+	// 	&author.Name,
+	// 	&CreatedAt,
+	// 	&UpdatedAt,
+	// )
+
+	// author.CreatedAt = CreatedAt.Format(time.RFC1123)
+	// author.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+
+	// if err == sql.ErrNoRows {
+	// 	a.Log.Error(err.Error())
+	// 	return &entities.Book{}, status.Error(codes.NotFound, "This author doesn't exist.")
+	// }
+	// if err != nil {
+	// 	a.Log.Error(err.Error())
+	// 	return &entities.Book{}, status.Error(codes.Internal, "Oops something went wrong.")
+	// }
+
+	return book, nil
+}
+
+func (a *BooksPostgres) CreateBook(req *entities.CreateBookReq) (*entities.Book, error) {
+	var res = &entities.Book{}
+	// query := `
+	// INSERT INTO author (
+	// 	author_name
+	// 	)
+	// VALUES
+	// 	($1)
+	// RETURNING
+	// 	author_id,
+	// 	author_name,
+	// 	created_at,
+	// 	updated_at;
+	// 	`
+
+	// err := a.db.QueryRow(
+	// 	query,
+	// 	req.Name).Scan(
+	// 	&res.ID,
+	// 	&res.Name,
+	// 	&CreatedAt,
+	// 	&UpdatedAt)
+
+	// if err != nil {
+	// 	a.Log.Error(err.Error())
+	// 	return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
+	// }
+	// res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	// res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	return res, nil
+}
+
+func (a *BooksPostgres) UpdateBook(id int, req *entities.UpdateBookReq) (*entities.Book, error) {
+	var res = &entities.Book{}
+	// query := `
+	// UPDATE
+	// 	author
+	// SET
+	// 	author_name =$1,
+	// 	updated_at = now()
+	// WHERE
+	// 	author_id=$2
+	// AND
+	// 	deleted_at
+	// IS NULL
+	// RETURNING
+	// 	author_id,
+	// 	author_name,
+	// 	created_at,
+	// 	updated_at;`
+
+	// err := a.db.QueryRow(
+	// 	query, req.Name, id).Scan(
+	// 	&res.ID,
+	// 	&res.Name,
+	// 	&CreatedAt,
+	// 	&UpdatedAt)
+
+	// if err != nil {
+	// 	a.Log.Error(err.Error())
+	// 	return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
+	// }
+
+	// res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	// res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+
+	return res, nil
+}
+
+func (a *BooksPostgres) DeleteBook(bookId int) error {
+	// queryDeleteBook := `
+	// UPDATE
+	// 	author
+	// SET
+	// 	deleted_at = now()
+	// WHERE
+	// 	author_2id=$1`
+
+	// _, err := a.db.Exec(queryDeleteBook, authorId)
+	// if err != nil {
+	// 	a.Log.Error(err.Error())
+	// 	return status.Error(codes.Internal, "Ooops something went wrong")
+	// }
+	return nil
+}

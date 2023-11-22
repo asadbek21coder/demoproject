@@ -39,14 +39,6 @@ func (h *Handler) getAuthorById(c *gin.Context) {
 	if HandleDatabaseLevelWithMessage(c, h.log, err, "h.services.Authors.GetAuthorById(id)") {
 		return
 	}
-	// if err != nil {
-	// 	log.Print("error : \n", err.Error())
-	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, entities.Response{
-	// 		ErrorCode:    entities.ErrorCodeInternal,
-	// 		ErrorMessage: "Ooops something went wrong",
-	// 	})
-	// 	return
-	// }
 
 	c.JSON(http.StatusOK, entities.GetAuthorByIdRes{
 		ErrorCode:    entities.ErrorSuccessCode,

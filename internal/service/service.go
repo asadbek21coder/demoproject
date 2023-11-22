@@ -7,6 +7,10 @@ import (
 
 type Books interface {
 	GetAllBooks(int, int) ([]*entities.Book, error)
+	GetBookById(int) (*entities.Book, error)
+	UpdateBook(int, *entities.UpdateBookReq) (*entities.Book, error)
+	CreateBook(*entities.CreateBookReq) (*entities.Book, error)
+	DeleteBook(int) error
 }
 
 type Authors interface {
