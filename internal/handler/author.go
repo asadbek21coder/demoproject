@@ -24,8 +24,10 @@ func (h *Handler) getAllAuthors(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"authors": authors,
+	c.JSON(http.StatusOK, entities.GetAllAuthors{
+		ErrorCode:    entities.ErrorSuccessCode,
+		ErrorMessage: "",
+		Body:         authors,
 	})
 }
 

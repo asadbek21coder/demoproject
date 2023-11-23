@@ -15,6 +15,12 @@ type GetBookByIdRes struct {
 	Body         *Book  `json:"body"`
 }
 
+type GetAllBooks struct {
+	ErrorCode    int     `json:"error_code"`
+	ErrorMessage string  `json:"error_message"`
+	Body         []*Book `json:"body"`
+}
+
 type BookRes struct {
 	ErrorCode    int    `json:"error_code"`
 	ErrorMessage string `json:"error_message"`

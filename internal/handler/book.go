@@ -23,8 +23,10 @@ func (h *Handler) getAllBooks(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"books": books,
+	c.JSON(http.StatusOK, entities.GetAllBooks{
+		ErrorCode:    entities.ErrorSuccessCode,
+		ErrorMessage: "",
+		Body:         books,
 	})
 }
 

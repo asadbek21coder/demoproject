@@ -13,6 +13,12 @@ type GetAuthorByIdRes struct {
 	Body         *Author `json:"body"`
 }
 
+type GetAllAuthors struct {
+	ErrorCode    int       `json:"error_code"`
+	ErrorMessage string    `json:"error_message"`
+	Body         []*Author `json:"body"`
+}
+
 type AuthorRes struct {
 	ErrorCode    int     `json:"error_code"`
 	ErrorMessage string  `json:"error_message"`
