@@ -55,9 +55,10 @@ func (h *Handler) createBook(c *gin.Context) {
 	if HandleBadRequestErrWithMessage(c, h.log, err, "c.ShouldBindJSON(&body)") {
 		return
 	}
-
 	res, err := h.services.Books.CreateBook(&entities.CreateBookReq{
-		Name: body.Name,
+		Title:  body.Title,
+		Author: body.Author,
+		Price:  body.Price,
 	})
 	if HandleDatabaseLevelWithMessage(c, h.log, err, "h.services.Books.CreateBook(&entities.CreateBookReq") {
 		return
@@ -84,7 +85,9 @@ func (h *Handler) updateBook(c *gin.Context) {
 	}
 
 	res, err := h.services.Books.UpdateBook(id, &entities.UpdateBookReq{
-		Name: body.Name,
+		Title:  body.Title,
+		Author: body.Author,
+		Price:  body.Price,
 	})
 	if HandleDatabaseLevelWithMessage(c, h.log, err, "h.services.Books.UpdateBook(id, &entities.UpdateBookReq") {
 		return

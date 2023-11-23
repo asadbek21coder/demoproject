@@ -2,7 +2,7 @@ package entities
 
 type Book struct {
 	ID        int    `json:"id"`
-	Name      string `json:"name"`
+	Title     string `json:"title"`
 	Author    int    `json:"author"`
 	Price     int    `json:"price"`
 	CreatedAt string `json:"created_at"`
@@ -28,13 +28,13 @@ type BookRes struct {
 }
 
 type CreateBookReq struct {
-	Name   string `json:"name"`
+	Title  string `json:"title"`
 	Author int    `json:"author"`
 	Price  int    `json:"price"`
 }
 
 type UpdateBookReq struct {
-	Name   string `json:"name"`
+	Title  string `json:"title"`
 	Author int    `json:"author"`
 	Price  int    `json:"price"`
 }

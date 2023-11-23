@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -64,7 +65,7 @@ func (r *BooksPostgres) GetAllBooks(page, limit int) ([]*entities.Book, error) {
 		book := &entities.Book{}
 		err := rows.Scan(
 			&book.ID,
-			&book.Name,
+			&book.Title,
 			&book.Author,
 			&book.Price,
 			&CreatedAt,
@@ -84,124 +85,141 @@ func (r *BooksPostgres) GetAllBooks(page, limit int) ([]*entities.Book, error) {
 
 func (a *BooksPostgres) GetBookById(id int) (*entities.Book, error) {
 	book := &entities.Book{}
-	// query := `
-	// 	SELECT
-	// 		author_id,
-	// 		author_name,
-	// 		created_at,
-	// 		updated_at
-	// 	FROM
-	// 		author
-	// 	WHERE
-	// 		author_id=$1
-	// 	AND
-	// 		deleted_at
-	// 	IS NULL`
+	query := `
+		SELECT
+			book_id,
+			book_title,
+			book_author,
+			book_price,
+			created_at,
+			updated_at
+		FROM
+			book
+		WHERE
+			book_id=$1
+		AND
+			deleted_at
+		IS NULL`
 
-	// err := a.db.QueryRow(query, id).Scan(
-	// 	&author.ID,
-	// 	&author.Name,
-	// 	&CreatedAt,
-	// 	&UpdatedAt,
-	// )
+	err := a.db.QueryRow(query, id).Scan(
+		&book.ID,
+		&book.Title,
+		&book.Author,
+		&book.Price,
+		&CreatedAt,
+		&UpdatedAt,
+	)
 
-	// author.CreatedAt = CreatedAt.Format(time.RFC1123)
-	// author.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	book.CreatedAt = CreatedAt.Format(time.RFC1123)
+	book.UpdatedAt = UpdatedAt.Format(time.RFC1123)
 
-	// if err == sql.ErrNoRows {
-	// 	a.Log.Error(err.Error())
-	// 	return &entities.Book{}, status.Error(codes.NotFound, "This author doesn't exist.")
-	// }
-	// if err != nil {
-	// 	a.Log.Error(err.Error())
-	// 	return &entities.Book{}, status.Error(codes.Internal, "Oops something went wrong.")
-	// }
+	if err == sql.ErrNoRows {
+		a.Log.Error(err.Error())
+		return &entities.Book{}, status.Error(codes.NotFound, "This book doesn't exist.")
+	}
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Book{}, status.Error(codes.Internal, "Oops something went wrong.")
+	}
 
 	return book, nil
 }
 
 func (a *BooksPostgres) CreateBook(req *entities.CreateBookReq) (*entities.Book, error) {
 	var res = &entities.Book{}
-	// query := `
-	// INSERT INTO author (
-	// 	author_name
-	// 	)
-	// VALUES
-	// 	($1)
-	// RETURNING
-	// 	author_id,
-	// 	author_name,
-	// 	created_at,
-	// 	updated_at;
-	// 	`
-
-	// err := a.db.QueryRow(
-	// 	query,
-	// 	req.Name).Scan(
-	// 	&res.ID,
-	// 	&res.Name,
-	// 	&CreatedAt,
-	// 	&UpdatedAt)
-
-	// if err != nil {
-	// 	a.Log.Error(err.Error())
-	// 	return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
-	// }
-	// res.CreatedAt = CreatedAt.Format(time.RFC1123)
-	// res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	query := `
+	INSERT INTO book (
+		book_title,
+		book_author,
+		book_price
+		)
+	VALUES
+		($1, $2, $3)
+	RETURNING
+		book_id,
+		book_title,
+		book_author,
+		book_price,
+		created_at,
+		updated_at;
+		`
+	err := a.db.QueryRow(
+		query,
+		req.Title,
+		req.Author,
+		req.Price,
+	).Scan(
+		&res.ID,
+		&res.Title,
+		&res.Author,
+		&res.Price,
+		&CreatedAt,
+		&UpdatedAt)
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
+	}
+	res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
 	return res, nil
 }
 
 func (a *BooksPostgres) UpdateBook(id int, req *entities.UpdateBookReq) (*entities.Book, error) {
 	var res = &entities.Book{}
-	// query := `
-	// UPDATE
-	// 	author
-	// SET
-	// 	author_name =$1,
-	// 	updated_at = now()
-	// WHERE
-	// 	author_id=$2
-	// AND
-	// 	deleted_at
-	// IS NULL
-	// RETURNING
-	// 	author_id,
-	// 	author_name,
-	// 	created_at,
-	// 	updated_at;`
+	query := `
+	UPDATE
+		book
+	SET
+		book_title =$1,
+		book_author =$2,
+		book_price =$3,
+		updated_at = now()
+	WHERE
+		book_id=$4
+	AND
+		deleted_at
+	IS NULL
+	RETURNING
+		book_id,
+		book_title,
+		book_author,
+		book_price,
+		created_at,
+		updated_at;`
 
-	// err := a.db.QueryRow(
-	// 	query, req.Name, id).Scan(
-	// 	&res.ID,
-	// 	&res.Name,
-	// 	&CreatedAt,
-	// 	&UpdatedAt)
+	err := a.db.QueryRow(
+		query, req.Title, req.Author, req.Price, id).Scan(
+		&res.ID,
+		&res.Title,
+		&res.Author,
+		&res.Price,
+		&CreatedAt,
+		&UpdatedAt)
 
-	// if err != nil {
-	// 	a.Log.Error(err.Error())
-	// 	return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
-	// }
+	if err != nil {
+		a.Log.Error(err.Error())
+		return &entities.Book{}, status.Error(codes.Internal, "Ooops something went wrong")
+	}
 
-	// res.CreatedAt = CreatedAt.Format(time.RFC1123)
-	// res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
+	res.CreatedAt = CreatedAt.Format(time.RFC1123)
+	res.UpdatedAt = UpdatedAt.Format(time.RFC1123)
 
 	return res, nil
 }
 
 func (a *BooksPostgres) DeleteBook(bookId int) error {
-	// queryDeleteBook := `
-	// UPDATE
-	// 	author
-	// SET
-	// 	deleted_at = now()
-	// WHERE
-	// 	author_2id=$1`
+	queryDeleteBook := `
+	UPDATE
+		book
+	SET
+		deleted_at = now()
+	WHERE
+		book_id=$1`
 
-	// _, err := a.db.Exec(queryDeleteBook, authorId)
-	// if err != nil {
-	// 	a.Log.Error(err.Error())
-	// 	return status.Error(codes.Internal, "Ooops something went wrong")
-	// }
+	_, err := a.db.Exec(queryDeleteBook, bookId)
+	if err != nil {
+		a.Log.Error(err.Error())
+		return status.Error(codes.Internal, "Ooops something went wrong")
+	}
 	return nil
 }
